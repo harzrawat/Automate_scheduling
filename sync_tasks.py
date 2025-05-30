@@ -1,6 +1,6 @@
 import os
 from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +16,9 @@ db = client.get_database()  # Automatically gets the DB from URI
 tasks_refresh_collection = db["tasks_refresh"]
 tasks_collection = db["tasks"]
 
-current_date = datetime.now().strftime('%Y-%m-%d')
+# Define IST (UTC+5:30)
+IST = timezone(timedelta(hours=5, minutes=30))
+current_date = datetime.now(IST).strftime('%Y-%m-%d')
 logger.info(f"Syncing tasks for date: {current_date}")
 
 refresh_tasks = list(tasks_refresh_collection.find({}))
