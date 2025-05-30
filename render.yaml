@@ -1,0 +1,10 @@
+services:
+  - type: cron
+    name: daily-task-sync
+    env: python
+    schedule: "2 0 * * *"  # Daily at 00:02 AM UTC
+    buildCommand: pip install -r requirements.txt
+    startCommand: python render_daily_sync.py
+    envVars:
+      - key: MONGO_URI
+        sync: false  # You'll set this manually in Render dashboard
