@@ -18,9 +18,11 @@ tasks_collection = db["tasks"]
 
 # Define IST (UTC+5:30)
 IST = timezone(timedelta(hours=5, minutes=30))
-current_date = datetime.now(IST).strftime('%Y-%m-%d')
+current_datetime = datetime.now(IST)
+current_date = current_datetime.strftime('%Y-%m-%d')
 logger.info(f"Syncing tasks for date: {current_date}")
 
+# Sync new tasks from tasks_refresh
 refresh_tasks = list(tasks_refresh_collection.find({}))
 logger.info(f"Found {len(refresh_tasks)} tasks in tasks_refresh collection")
 
@@ -36,3 +38,8 @@ else:
         tasks_collection.insert_one(task_data)
 
     logger.info("Sync completed successfully.")
+
+# Delete tasks older than 5 days
+cutoff_date = (current_datetime - timedelta(days=5)).strftime('%Y-%m-%d')
+delete_result = tasks_collection.delete_many({"date": {"$lt": cutoff_date}})
+logger.info(f"Deleted {delete_result.deleted_count} old tasks (before {cutoff_date})")
